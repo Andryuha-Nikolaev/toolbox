@@ -1,0 +1,19 @@
+{
+  "name": "toolbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local toolbox: document and image processing deps + ready-made CLI scripts",
+  "dependencies": {
+    "@joplin/turndown-plugin-gfm": "^1.0.67",
+    "docx": "^9.7.1",
+    "exceljs": "^4.4.0",
+    "fflate": "^0.8.2",
+    "mammoth": "^1.12.2",
+    "marked": "^16.4.1",
+    "pptxgenjs": "^4.0.1",
+    "sharp-cli": "^6.0.0",
+    "turndown": "^7.2.4",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
+}
