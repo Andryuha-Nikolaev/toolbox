@@ -30,6 +30,7 @@ pnpm install
 | `fflate`                | распаковка pptx как ZIP          |
 | `marked`                | парсинг Markdown                 |
 | `sharp-cli`             | изображения — см. скилл `images` |
+| `ag-psd`                | чтение PSD: слои, тексты, пиксели |
 
 SheetJS взят с `cdn.sheetjs.com`, а не с npm: на npm застряла 0.18.5,
 снятая с поддержки, с prototype-pollution и ReDoS. Обновлять оттуда же.
@@ -44,11 +45,13 @@ node C:\Dev\toolbox\scripts\xlsx2json.mjs    <file.xlsx> [--list|--sheet N|--csv
 node C:\Dev\toolbox\scripts\docx2md.mjs      <file.docx> [--html|--media-dir DIR|--out F]
 node C:\Dev\toolbox\scripts\pptx-extract.mjs <file.pptx> [--json|--media-dir DIR|--notes|--out F]
 node C:\Dev\toolbox\scripts\md2docx.mjs      <file.md>   --out <file.docx> [--title T]
+node C:\Dev\toolbox\scripts\psd-extract.mjs  <file.psd>  --out DIR [--png|--filter RE|--cutout RE|--hidden|--composite]
 ```
 
 Каждый скрипт печатает подсказку при запуске без аргументов.
 Результат идёт в stdout, диагностика — в stderr, так что вывод можно
-перенаправлять в файл без мусора.
+перенаправлять в файл без мусора. Исключение — psd-extract: он пишет файлы
+в `--out`.
 
 Детали:
 
@@ -62,6 +65,19 @@ node C:\Dev\toolbox\scripts\md2docx.mjs      <file.md>   --out <file.docx> [--ti
 - **md2docx** — базовый конвертер: заголовки, абзацы, жирный/курсив/код/ссылки,
   списки (настоящая нумерация Word), таблицы, цитаты, код-блоки, разделители.
   Нужно сложнее — писать разовый скрипт прямо на пакете `docx`.
+- **psd-extract** — всегда пишет `tree.json` и `tree.txt`: дерево слоёв,
+  bounds, видимость, blend mode, тексты и шрифты. PNG кодируется встроенным
+  `node:zlib`, canvas не нужен; ресайз и WebP — дальше через `sharp`.
+  - `--png` — сырые пиксели слоёв. Корректирующие слои (Curves, Selective
+    Color…) к ним **не применяются**, цвета могут отличаться от макета.
+  - `--cutout RE` — группа или слой целиком: цвет из итогового изображения
+    PSD, альфа из слоёв. Цвета как в макете, но элементы, лежащие выше по
+    слоям, запекаются внутрь, а по краям остаётся след фона.
+  - Нужен PSD, сохранённый с «Maximize compatibility», иначе нет итогового
+    изображения для `--composite` и `--cutout`.
+  - В Git Bash регулярку не начинать с `/` — MSYS превратит её в путь.
+  - Превью инструмента Read альфу не показывает; проверять через
+    `sharp ... flatten "#2a6b4f"`.
 
 ## Генерация xlsx / pptx
 
