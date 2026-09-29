@@ -30,10 +30,18 @@ pnpm install
 | `fflate`                | распаковка pptx как ZIP          |
 | `marked`                | парсинг Markdown                 |
 | `sharp-cli`             | изображения — см. скилл `images` |
+| `sharp`                 | API для разовых скриптов (composite, blend) |
 | `ag-psd`                | чтение PSD: слои, тексты, пиксели |
 
 SheetJS взят с `cdn.sheetjs.com`, а не с npm: на npm застряла 0.18.5,
 снятая с поддержки, с prototype-pollution и ReDoS. Обновлять оттуда же.
+
+Разовый скрипт вне тулбокса берёт пакеты отсюда так:
+
+```js
+import { createRequire } from "node:module";
+const sharp = createRequire("C:/Dev/toolbox/")("sharp");
+```
 
 ## Скрипты
 
