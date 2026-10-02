@@ -97,8 +97,8 @@ node C:\Dev\toolbox\scripts\ico.mjs          <file.ico>  --info
     подправленные руками.
   - Записи — BMP 32bpp с альфой, как у RealFaviconGenerator. `--png` — PNG
     внутри, 256 всегда PNG. PNG-записи браузеры понимают, а
-    `System.Drawing.Icon` из .NET Framework — нет: читает их как BMP и
-    выдаёт мусор.
+    `System.Drawing.Icon` из .NET Framework — нет: вместо картинки выдаёт
+    мусор.
   - `--info` — что лежит в готовом ICO: размер из каталога и из самой
     картинки, формат, байты.
 
