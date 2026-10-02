@@ -15,6 +15,7 @@
     "pptxgenjs": "^4.0.1",
     "sharp": "0.35.3",
     "sharp-cli": "^6.0.0",
+    "subset-font": "^2.9.0",
     "turndown": "^7.2.4",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   }

@@ -32,6 +32,7 @@ pnpm install
 | `sharp-cli`             | изображения — см. скилл `images` |
 | `sharp`                 | API для разовых скриптов (composite, blend) |
 | `ag-psd`                | чтение PSD: слои, тексты, пиксели |
+| `subset-font`           | шрифты: сабсет и ttf/otf → woff2 |
 
 SheetJS взят с `cdn.sheetjs.com`, а не с npm: на npm застряла 0.18.5,
 снятая с поддержки, с prototype-pollution и ReDoS. Обновлять оттуда же.
@@ -86,6 +87,18 @@ node C:\Dev\toolbox\scripts\psd-extract.mjs  <file.psd>  --out DIR [--png|--filt
   - В Git Bash регулярку не начинать с `/` — MSYS превратит её в путь.
   - Превью инструмента Read альфу не показывает; проверять через
     `sharp ... flatten "#2a6b4f"`.
+
+## Шрифты
+
+Готового скрипта нет: набор начертаний и символов каждый раз свой.
+Второй аргумент — строка символов, которые останутся в шрифте, а не
+unicode-range.
+
+```js
+import { createRequire } from 'node:module';
+const subsetFont = createRequire('C:/Dev/toolbox/')('subset-font');
+const woff2 = await subsetFont(ttfBuffer, charsToKeep, { targetFormat: 'woff2' });
+```
 
 ## Генерация xlsx / pptx
 
