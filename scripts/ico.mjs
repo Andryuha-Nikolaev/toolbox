@@ -124,7 +124,13 @@ for (const { size, image } of sources) {
   if (flags.png || size === 256) {
     images.push(await image.png().toBuffer());
   } else {
-    const { data } = await image.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const { data, info } = await image
+      .toColourspace('srgb')
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    // bmp() reads 4 bytes per pixel; guard in case a sharp update changes raw output
+    if (info.channels !== 4) die(`${size}px: got ${info.channels} channels, expected RGBA`);
     images.push(bmp(data, size));
   }
 }
