@@ -55,12 +55,14 @@ node C:\Dev\toolbox\scripts\docx2md.mjs      <file.docx> [--html|--media-dir DIR
 node C:\Dev\toolbox\scripts\pptx-extract.mjs <file.pptx> [--json|--media-dir DIR|--notes|--out F]
 node C:\Dev\toolbox\scripts\md2docx.mjs      <file.md>   --out <file.docx> [--title T]
 node C:\Dev\toolbox\scripts\psd-extract.mjs  <file.psd>  --out DIR [--png|--filter RE|--cutout RE|--hidden|--composite]
+node C:\Dev\toolbox\scripts\ico.mjs          <image>     --out <file.ico> [--sizes 16,32,48|--png]
+node C:\Dev\toolbox\scripts\ico.mjs          <file.ico>  --info
 ```
 
 Каждый скрипт печатает подсказку при запуске без аргументов.
 Результат идёт в stdout, диагностика — в stderr, так что вывод можно
-перенаправлять в файл без мусора. Исключение — psd-extract: он пишет файлы
-в `--out`.
+перенаправлять в файл без мусора. Исключения — psd-extract и ico: они
+пишут файлы в `--out`.
 
 Детали:
 
@@ -87,6 +89,18 @@ node C:\Dev\toolbox\scripts\psd-extract.mjs  <file.psd>  --out DIR [--png|--filt
   - В Git Bash регулярку не начинать с `/` — MSYS превратит её в путь.
   - Превью инструмента Read альфу не показывает; проверять через
     `sharp ... flatten "#2a6b4f"`.
+- **ico** — sharp ICO не пишет, поэтому кодировщик свой, на sharp. По
+  умолчанию 16, 32 и 48 — стандартный набор `favicon.ico`.
+  - Вход — квадратная картинка любого формата, который читает sharp, SVG
+    тоже: при ресайзе он рисуется сразу в нужном размере. Несколько файлов —
+    каждый идёт в своём размере, без ресайза: под мелкие размеры,
+    подправленные руками.
+  - Записи — BMP 32bpp с альфой, как у RealFaviconGenerator. `--png` — PNG
+    внутри, 256 всегда PNG. PNG-записи браузеры понимают, а
+    `System.Drawing.Icon` из .NET Framework — нет: читает их как BMP и
+    выдаёт мусор.
+  - `--info` — что лежит в готовом ICO: размер из каталога и из самой
+    картинки, формат, байты.
 
 ## Шрифты
 
