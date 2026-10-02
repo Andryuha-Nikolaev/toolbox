@@ -26,6 +26,7 @@ function info(file) {
   const type = b.length >= 6 && b.readUInt16LE(0) === 0 ? b.readUInt16LE(2) : 0;
   if (type !== 1 && type !== 2) die(`${file}: not an ICO`);
   const count = b.readUInt16LE(4);
+  if (6 + count * 16 > b.length) die(`${file}: ${count} entries do not fit in ${b.length} bytes`);
   console.log(`${file}: ${type === 1 ? 'icon' : 'cursor'}, ${count} image(s), ${b.length} bytes`);
   for (let i = 0; i < count; i++) {
     const e = 6 + i * 16;
@@ -37,10 +38,16 @@ function info(file) {
       continue;
     }
     const data = b.subarray(offset, offset + bytes);
+    const png = data.length >= 8 && data.subarray(0, 8).equals(PNG_SIG);
+    if (data.length < (png ? 26 : 16)) {
+      console.log(`  ${size}  truncated entry, ${bytes} bytes`);
+      continue;
+    }
     let actual;
-    if (data.subarray(0, 8).equals(PNG_SIG)) {
-      const bpp = data[24] * PNG_CHANNELS[data[25]];
-      actual = `${data.readUInt32BE(16)}x${data.readUInt32BE(20)}  PNG ${bpp}bpp`;
+    if (png) {
+      const channels = PNG_CHANNELS[data[25]];
+      const bpp = channels ? `${data[24] * channels}bpp` : `colour type ${data[25]}`;
+      actual = `${data.readUInt32BE(16)}x${data.readUInt32BE(20)}  PNG ${bpp}`;
     } else {
       // BMP height covers the color bitmap and the AND mask together
       actual = `${data.readInt32LE(4)}x${data.readInt32LE(8) / 2}  BMP ${data.readUInt16LE(14)}bpp`;
