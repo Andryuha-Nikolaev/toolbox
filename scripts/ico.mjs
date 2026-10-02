@@ -84,7 +84,7 @@ function bmp(rgba, size) {
   return Buffer.concat([header, color, mask]);
 }
 
-const { positional, flags } = parseArgs(process.argv.slice(2));
+const { positional, flags } = parseArgs(process.argv.slice(2), ['info', 'png']);
 if (!positional.length) die('no input file', USAGE);
 
 if (flags.info) {

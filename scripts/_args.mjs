@@ -1,4 +1,5 @@
-export function parseArgs(argv) {
+// booleans: flags that never take a value, so `--png file.png` keeps the file positional
+export function parseArgs(argv, booleans = []) {
   const positional = [];
   const flags = {};
   for (let i = 0; i < argv.length; i++) {
@@ -6,7 +7,7 @@ export function parseArgs(argv) {
     if (a.startsWith('--')) {
       const key = a.slice(2);
       const next = argv[i + 1];
-      if (next === undefined || next.startsWith('--')) flags[key] = true;
+      if (booleans.includes(key) || next === undefined || next.startsWith('--')) flags[key] = true;
       else { flags[key] = next; i++; }
     } else positional.push(a);
   }
