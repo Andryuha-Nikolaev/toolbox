@@ -12,10 +12,16 @@
 ```powershell
 cd C:\Dev\toolbox
 pnpm install
+uv sync
 ```
 
 `C:\Dev\toolbox\node_modules\.bin` добавлен в пользовательский PATH,
 поэтому `sharp` доступен из любой папки.
+
+`uv` стоит через proto (`proto install uv --pin global`). Системного
+Python нет: `uv sync` сам скачивает версию из `.python-version` и кладёт
+окружение в `.venv`. В PATH Python не попадает — Python-скрипты идут
+только через `uv run --project C:\Dev\toolbox`.
 
 ## Что внутри
 
@@ -33,6 +39,7 @@ pnpm install
 | `sharp`                 | API для разовых скриптов (composite, blend) |
 | `ag-psd`                | чтение PSD: слои, тексты, пиксели |
 | `subset-font`           | шрифты: сабсет и ttf/otf → woff2 |
+| `fonttools` (Python)    | шрифты: правка глифов и таблиц   |
 
 SheetJS взят с `cdn.sheetjs.com`, а не с npm: на npm застряла 0.18.5,
 снятая с поддержки, с prototype-pollution и ReDoS. Обновлять оттуда же.
@@ -57,6 +64,9 @@ node C:\Dev\toolbox\scripts\md2docx.mjs      <file.md>   --out <file.docx> [--ti
 node C:\Dev\toolbox\scripts\psd-extract.mjs  <file.psd>  --out DIR [--png|--filter RE|--cutout RE|--hidden|--composite]
 node C:\Dev\toolbox\scripts\ico.mjs          <image>     --out <file.ico> [--sizes 16,32,48|--png]
 node C:\Dev\toolbox\scripts\ico.mjs          <file.ico>  --info
+uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --info [--chars LIST]
+uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --chars LIST --dy N --out F
+uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --diff <other>
 ```
 
 Каждый скрипт печатает подсказку при запуске без аргументов.
@@ -104,6 +114,29 @@ node C:\Dev\toolbox\scripts\ico.mjs          <file.ico>  --info
 
 ## Шрифты
 
+### Сдвиг глифов — font-shift
+
+Двигает глифы символов по вертикали: дефис, который стоит слишком
+высоко, кавычки и т. п. Только TrueType-контуры (`glyf`), CFF — нет.
+
+- `--chars` — `U+002D,U+00AD` или сами символы. Символа нет в шрифте —
+  пропускается с предупреждением.
+- `--dy` — в единицах шрифта (`--info` печатает upm), минус — вниз.
+  Целевую высоту удобно брать с соседнего глифа: `--info --chars`
+  показывает bbox.
+- Составные глифы, собранные из сдвинутого, едут вместе с ним — скрипт
+  их перечисляет. Сдвиг составного глифа двигает его компоненты.
+- Сводные значения (bbox в `head`, `hhea`, `maxp`) не пересчитываются,
+  чтобы файл отличался только сдвинутыми глифами; bbox в `head` только
+  расширяется, если глиф за него вышел.
+- `--diff` — что отличается между двумя файлами: контуры, `hmtx`,
+  поля `head`/`hhea`/`maxp`/`OS/2`/`post`, остальные таблицы побайтово.
+  Прогонять после каждой правки.
+- Шрифт под OFL с Reserved Font Name (`--info`, name 0 / 13) — у
+  изменённой версии внутреннее имя надо сменить. Скрипт этого не делает.
+
+### Сабсет
+
 Готового скрипта нет: набор начертаний и символов каждый раз свой.
 Второй аргумент — строка символов, которые останутся в шрифте, а не
 unicode-range.
@@ -134,7 +167,7 @@ const ExcelJS = require('exceljs');
 
 ## Оговорка про .prototools
 
-Пин `node`/`pnpm` в этом репо действует только когда cwd находится внутри
+Пин `node`/`pnpm`/`uv` в этом репо действует только когда cwd находится внутри
 `C:\Dev\toolbox` — то есть при `pnpm install` / `pnpm up`. При запуске
 `node C:\Dev\toolbox\scripts\...` из папки другого проекта proto возьмёт
 версию по cwd, из того проекта. Это страховка обслуживания репо, а не
@@ -146,6 +179,8 @@ const ExcelJS = require('exceljs');
 cd C:\Dev\toolbox
 pnpm outdated
 pnpm up
+uv lock --upgrade
+uv sync
 ```
 
 После обновления прогнать скрипты на тестовых файлах — API `docx` и
