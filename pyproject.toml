@@ -1,0 +1,8 @@
+[project]
+name = "toolbox"
+version = "1.0.0"
+description = "Local toolbox: Python side, run through uv"
+requires-python = ">=3.14"
+dependencies = [
+    "fonttools[woff]>=4.67.0",
+]
