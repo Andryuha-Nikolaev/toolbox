@@ -12,6 +12,7 @@
     "fflate": "^0.8.2",
     "mammoth": "^1.12.2",
     "marked": "^16.4.1",
+    "playwright": "^1.64.1",
     "pptxgenjs": "^4.0.1",
     "sharp": "0.35.3",
     "sharp-cli": "^6.0.0",

@@ -40,6 +40,7 @@ Python нет: `uv sync` сам скачивает версию из `.python-ve
 | `ag-psd`                | чтение PSD: слои, тексты, пиксели |
 | `subset-font`           | шрифты: сабсет и ttf/otf → woff2 |
 | `fonttools` (Python)    | шрифты: правка глифов и таблиц   |
+| `playwright`            | вёрстка в WebKit («как в Safari») и эмуляция мобилок |
 
 SheetJS взят с `cdn.sheetjs.com`, а не с npm: на npm застряла 0.18.5,
 снятая с поддержки, с prototype-pollution и ReDoS. Обновлять оттуда же.
@@ -161,7 +162,13 @@ const ExcelJS = require('exceljs');
 ## Чего здесь нет
 
 - **PDF** — генерация через HTML/CSS + Playwright, он подключён как MCP.
-  Браузеры Playwright сюда не тянем: ~500 МБ.
+- **Chromium и Firefox от Playwright.** Скачан только WebKit
+  (`pnpm exec playwright install webkit`, ~170 МБ) — им проверяем вёрстку
+  под Safari. Это не настоящий Safari, а сборка WebKit под Windows: баги
+  движка ловит, баги iOS — не всегда. Для Chromium берём системный Chrome:
+  `chromium.launch({ channel: "chrome" })`. Мобилки эмулируем через
+  `devices["Pixel 7"]` / `devices["iPhone 13"]`. После `pnpm up` версия
+  WebKit может смениться — тогда повторить `install webkit`.
 - **ImageMagick** — не установлен. Что без него нельзя и как ставить —
   в скилле `images`.
 
