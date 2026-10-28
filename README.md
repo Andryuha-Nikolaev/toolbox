@@ -159,16 +159,40 @@ const require = createRequire('C:/Dev/toolbox/scripts/');
 const ExcelJS = require('exceljs');
 ```
 
+## Браузеры
+
+Из браузеров Playwright скачан только WebKit
+(`pnpm exec playwright install webkit`, ~170 МБ). Им воспроизводим
+дефекты вёрстки в Safari. Playwright MCP для этого не годится: он
+работает через системный Chrome.
+
+```js
+import { createRequire } from "node:module";
+const { webkit, devices } = createRequire("C:/Dev/toolbox/")("playwright");
+
+const browser = await webkit.launch();
+const context = await browser.newContext({ ...devices["iPhone 13"] });
+const page = await context.newPage();
+await page.goto("http://localhost:3000");
+await page.screenshot({ path: "shot.png", fullPage: true });
+await browser.close();
+```
+
+- Это не настоящий Safari, а сборка WebKit под Windows: баги движка
+  ловит, баги iOS — не всегда.
+- `devices["iPhone 13"]` даёт ширину 390, DPR 3 и тач. User-Agent в нём
+  подставной (iOS 15), версию движка печатает `browser.version()`.
+- Десктопный Safari — `newContext()` без `devices`, по умолчанию окно
+  1280×720.
+- Chromium в скрипте — системный Chrome:
+  `chromium.launch({ channel: "chrome" })`, мобилка — `devices["Pixel 7"]`.
+- После `pnpm up` версия WebKit может смениться — тогда повторить
+  `install webkit`.
+
 ## Чего здесь нет
 
 - **PDF** — генерация через HTML/CSS + Playwright, он подключён как MCP.
-- **Chromium и Firefox от Playwright.** Скачан только WebKit
-  (`pnpm exec playwright install webkit`, ~170 МБ) — им проверяем вёрстку
-  под Safari. Это не настоящий Safari, а сборка WebKit под Windows: баги
-  движка ловит, баги iOS — не всегда. Для Chromium берём системный Chrome:
-  `chromium.launch({ channel: "chrome" })`. Мобилки эмулируем через
-  `devices["Pixel 7"]` / `devices["iPhone 13"]`. После `pnpm up` версия
-  WebKit может смениться — тогда повторить `install webkit`.
+- **Chromium и Firefox от Playwright** — не скачаны, см. «Браузеры».
 - **ImageMagick** — не установлен. Что без него нельзя и как ставить —
   в скилле `images`.
 
