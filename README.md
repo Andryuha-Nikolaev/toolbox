@@ -71,6 +71,8 @@ node C:\Dev\toolbox\scripts\md2docx.mjs      <file.md>   --out <file.docx> [--ti
 node C:\Dev\toolbox\scripts\psd-extract.mjs  <file.psd>  --out DIR [--png|--filter RE|--cutout RE|--hidden|--composite]
 node C:\Dev\toolbox\scripts\ico.mjs          <image>     --out <file.ico> [--sizes 16,32,48|--png]
 node C:\Dev\toolbox\scripts\ico.mjs          <file.ico>  --info
+node C:\Dev\toolbox\scripts\frames2video.mjs <frames dir> --out <file.mp4> [--fps 30|--width 1280|--crf 20]
+node C:\Dev\toolbox\scripts\frames2video.mjs <frames dir> --sheet <file.png> [--count 24|--every N|--cols 6|--from N|--to N]
 uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --info [--chars LIST]
 uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --chars LIST --dy N --out F
 uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --diff <other>
