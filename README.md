@@ -41,6 +41,12 @@ Python нет: `uv sync` сам скачивает версию из `.python-ve
 | `subset-font`           | шрифты: сабсет и ttf/otf → woff2 |
 | `fonttools` (Python)    | шрифты: правка глифов и таблиц   |
 | `playwright`            | вёрстка в WebKit («как в Safari») и эмуляция мобилок |
+| `ffmpeg-static`         | ffmpeg: кадры → видео, листы кадров |
+
+`ffmpeg-static` скачивает бинарник скриптом установки. pnpm такие скрипты
+блокирует, разрешение — `allowBuilds` в `pnpm-workspace.yaml`
+(`pnpm approve-builds ffmpeg-static`). Сборка gyan.dev essentials, GPL:
+как инструмент, в продукт не идёт.
 
 SheetJS взят с `cdn.sheetjs.com`, а не с npm: на npm застряла 0.18.5,
 снятая с поддержки, с prototype-pollution и ReDoS. Обновлять оттуда же.
@@ -72,8 +78,8 @@ uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --di
 
 Каждый скрипт печатает подсказку при запуске без аргументов.
 Результат идёт в stdout, диагностика — в stderr, так что вывод можно
-перенаправлять в файл без мусора. Исключения — psd-extract и ico: они
-пишут файлы в `--out`.
+перенаправлять в файл без мусора. Исключения — psd-extract, ico и frames2video:
+они пишут файлы в `--out` и `--sheet`.
 
 Детали:
 
@@ -112,6 +118,11 @@ uv run --project C:\Dev\toolbox C:\Dev\toolbox\scripts\font-shift.py <font> --di
     мусор.
   - `--info` — что лежит в готовом ICO: размер из каталога и из самой
     картинки, формат, байты.
+- **frames2video** — кадры с номерами `00001.png`… в H.264 (yuv420p, играет
+  в браузере) или в лист кадров: сетка уменьшенных кадров, чтобы быстро
+  пролистать прогон глазами или инструментом Read. Номера кадров на листе
+  скрипт печатает в stdout, подписей на картинке нет: drawtext ffmpeg на
+  Windows требует путь к шрифту.
 
 ## Шрифты
 
